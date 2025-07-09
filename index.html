@@ -13,87 +13,206 @@
     <meta name="theme-color" content="#6366f1">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-music" aria-hidden="true"></i> Dance Class Attendance Tracker</h1>
-            <p>Track your students' weekly attendance with ease</p>
-        </header>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-music login-icon"></i>
+                <h1>Dance Class Attendance</h1>
+                <p>Secure teacher portal for attendance tracking</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('register')">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required placeholder="Create a password" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="registerSchool">School/Studio</label>
+                    <input type="text" id="registerSchool" required placeholder="Enter your school or studio name">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+        </div>
+    </div>
 
-        <div class="main-content">
-            <!-- Student Management Section -->
-            <section class="student-section" aria-label="Student Management">
-                <h2><i class="fas fa-users" aria-hidden="true"></i> Student Management</h2>
-                <div class="add-student-form">
-                    <input 
-                        type="text" 
-                        id="studentName" 
-                        placeholder="Enter student name" 
-                        maxlength="50"
-                        aria-label="Student name"
-                        autocomplete="off">
-                    <button 
-                        onclick="addStudent()" 
-                        class="btn btn-primary"
-                        aria-label="Add new student">
-                        <i class="fas fa-plus" aria-hidden="true"></i> Add Student
-                    </button>
-                </div>
-                <div class="student-list" id="studentList" role="list" aria-label="List of students">
-                    <!-- Students will be dynamically added here -->
-                </div>
-            </section>
-
-            <!-- Attendance Section -->
-            <section class="attendance-section" aria-label="Weekly Attendance">
-                <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Weekly Attendance</h2>
-                <div class="week-selector">
-                    <label for="weekDate">Select Week:</label>
-                    <input 
-                        type="date" 
-                        id="weekDate" 
-                        onchange="loadAttendanceForWeek()"
-                        aria-label="Select week for attendance">
-                    <button 
-                        onclick="markAttendanceForWeek()" 
-                        class="btn btn-success"
-                        data-tooltip="Save attendance for selected week">
-                        <i class="fas fa-check" aria-hidden="true"></i> Save Attendance
-                    </button>
-                </div>
-                <div class="attendance-grid" id="attendanceGrid" role="group" aria-label="Student attendance checkboxes">
-                    <!-- Attendance checkboxes will be dynamically added here -->
-                </div>
-            </section>
-
-            <!-- Statistics Section -->
-            <section class="stats-section" aria-label="Attendance Statistics">
-                <h2><i class="fas fa-chart-bar" aria-hidden="true"></i> Attendance Statistics</h2>
-                <div class="stats-grid" id="statsGrid" role="list" aria-label="Attendance statistics">
-                    <!-- Statistics will be dynamically added here -->
-                </div>
-            </section>
-
-            <!-- History Section -->
-            <section class="history-section" aria-label="Attendance History">
-                <h2><i class="fas fa-history" aria-hidden="true"></i> Attendance History</h2>
-                <div class="history-controls">
-                    <select 
-                        id="historyStudent" 
-                        onchange="loadStudentHistory()"
-                        aria-label="Select student to view history">
-                        <option value="">Select a student</option>
+    <!-- Main App (hidden initially) -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <nav class="app-navbar">
+            <div class="nav-left">
+                <i class="fas fa-music"></i>
+                <span class="app-title">Dance Attendance</span>
+            </div>
+            <div class="nav-center">
+                <div class="classroom-selector">
+                    <select id="classroomSelect" onchange="switchClassroom()">
+                        <option value="">Select Classroom</option>
                     </select>
-                    <button 
-                        onclick="exportData()" 
-                        class="btn btn-secondary"
-                        data-tooltip="Download attendance data as JSON file">
-                        <i class="fas fa-download" aria-hidden="true"></i> Export Data
+                    <button onclick="showCreateClassroomModal()" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-plus"></i> New Class
                     </button>
                 </div>
-                <div class="history-display" id="historyDisplay" aria-live="polite" aria-label="Student attendance history">
-                    <!-- History will be displayed here -->
+            </div>
+            <div class="nav-right">
+                <span class="teacher-name" id="teacherName"></span>
+                <button onclick="logout()" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <!-- Classroom Header -->
+            <div id="classroomHeader" class="classroom-header" style="display: none;">
+                <h1 id="classroomTitle">Select a classroom to get started</h1>
+                <p id="classroomSubtitle">Choose from your existing classes or create a new one</p>
+            </div>
+
+            <div class="main-content" id="mainContent" style="display: none;">
+                <!-- Student Management Section -->
+                <section class="student-section" aria-label="Student Management">
+                    <h2><i class="fas fa-users" aria-hidden="true"></i> Student Management</h2>
+                    <div class="add-student-form">
+                        <input 
+                            type="text" 
+                            id="studentName" 
+                            placeholder="Enter student name" 
+                            maxlength="50"
+                            aria-label="Student name"
+                            autocomplete="off">
+                        <button 
+                            onclick="addStudent()" 
+                            class="btn btn-primary"
+                            aria-label="Add new student">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Student
+                        </button>
+                    </div>
+                    <div class="student-list" id="studentList" role="list" aria-label="List of students">
+                        <!-- Students will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Attendance Section -->
+                <section class="attendance-section" aria-label="Weekly Attendance">
+                    <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Weekly Attendance</h2>
+                    <div class="week-selector">
+                        <label for="weekDate">Select Week:</label>
+                        <input 
+                            type="date" 
+                            id="weekDate" 
+                            onchange="loadAttendanceForWeek()"
+                            aria-label="Select week for attendance">
+                        <button 
+                            onclick="markAttendanceForWeek()" 
+                            class="btn btn-success"
+                            data-tooltip="Save attendance for selected week">
+                            <i class="fas fa-check" aria-hidden="true"></i> Save Attendance
+                        </button>
+                    </div>
+                    <div class="attendance-grid" id="attendanceGrid" role="group" aria-label="Student attendance checkboxes">
+                        <!-- Attendance checkboxes will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Statistics Section -->
+                <section class="stats-section" aria-label="Attendance Statistics">
+                    <h2><i class="fas fa-chart-bar" aria-hidden="true"></i> Attendance Statistics</h2>
+                    <div class="stats-grid" id="statsGrid" role="list" aria-label="Attendance statistics">
+                        <!-- Statistics will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section class="history-section" aria-label="Attendance History">
+                    <h2><i class="fas fa-history" aria-hidden="true"></i> Attendance History</h2>
+                    <div class="history-controls">
+                        <select 
+                            id="historyStudent" 
+                            onchange="loadStudentHistory()"
+                            aria-label="Select student to view history">
+                            <option value="">Select a student</option>
+                        </select>
+                        <button 
+                            onclick="exportData()" 
+                            class="btn btn-secondary"
+                            data-tooltip="Download attendance data as JSON file">
+                            <i class="fas fa-download" aria-hidden="true"></i> Export Data
+                        </button>
+                    </div>
+                    <div class="history-display" id="historyDisplay" aria-live="polite" aria-label="Student attendance history">
+                        <!-- History will be displayed here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Classroom Modal -->
+    <div id="createClassroomModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-chalkboard-teacher"></i> Create New Classroom</h3>
+                <button onclick="hideCreateClassroomModal()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="createClassroomForm" class="modal-form">
+                <div class="form-group">
+                    <label for="classroomName">Classroom Name</label>
+                    <input type="text" id="classroomName" required placeholder="e.g., Beginner Ballet, Advanced Hip-Hop">
                 </div>
-            </section>
+                <div class="form-group">
+                    <label for="classroomDescription">Description (Optional)</label>
+                    <textarea id="classroomDescription" placeholder="Brief description of the class" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="classroomLevel">Level</label>
+                    <select id="classroomLevel" required>
+                        <option value="">Select Level</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Mixed">Mixed Level</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="hideCreateClassroomModal()" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Classroom
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

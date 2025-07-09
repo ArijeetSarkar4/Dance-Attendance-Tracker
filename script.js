@@ -1,28 +1,316 @@
-// Global variables
-let students = JSON.parse(localStorage.getItem('danceStudents')) || [];
-let attendanceRecords = JSON.parse(localStorage.getItem('danceAttendance')) || {};
+// Global variables for authentication and classroom management
+let currentUser = null;
+let currentClassroom = null;
+let users = JSON.parse(localStorage.getItem('danceUsers')) || [];
+let classrooms = JSON.parse(localStorage.getItem('danceClassrooms')) || {};
+let students = [];
+let attendanceRecords = {};
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is already logged in
+    const savedUser = localStorage.getItem('currentDanceUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showMainApp();
+    } else {
+        showLoginScreen();
+    }
+    
+    // Setup form handlers
+    setupFormHandlers();
+    setupKeyboardShortcuts();
+});
+
+// Authentication Functions
+function setupFormHandlers() {
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+    });
+    
+    // Register form
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleRegister();
+    });
+    
+    // Create classroom form
+    document.getElementById('createClassroomForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleCreateClassroom();
+    });
+}
+
+function switchTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update forms
+    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(tab + 'Form').classList.add('active');
+}
+
+function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    if (!user) {
+        showNotification('User not found. Please register first.', 'error');
+        return;
+    }
+    
+    // Simple password check (in production, use proper hashing)
+    if (user.password !== password) {
+        showNotification('Invalid password', 'error');
+        return;
+    }
+    
+    // Login successful
+    currentUser = user;
+    localStorage.setItem('currentDanceUser', JSON.stringify(currentUser));
+    showNotification(`Welcome back, ${user.name}!`);
+    
+    setTimeout(() => {
+        showMainApp();
+    }, 1000);
+}
+
+function handleRegister() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const school = document.getElementById('registerSchool').value.trim();
+    
+    if (!name || !email || !password || !school) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showNotification('Password must be at least 6 characters', 'error');
+        return;
+    }
+    
+    // Check if user already exists
+    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        showNotification('Email already registered. Please login instead.', 'error');
+        return;
+    }
+    
+    // Create new user
+    const newUser = {
+        id: Date.now().toString(),
+        name: name,
+        email: email.toLowerCase(),
+        password: password, // In production, hash this
+        school: school,
+        dateCreated: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('danceUsers', JSON.stringify(users));
+    
+    // Initialize empty classrooms for new user
+    if (!classrooms[newUser.id]) {
+        classrooms[newUser.id] = {};
+        localStorage.setItem('danceClassrooms', JSON.stringify(classrooms));
+    }
+    
+    showNotification('Account created successfully! Please login.');
+    
+    // Switch to login tab
+    setTimeout(() => {
+        switchTab('login');
+        document.getElementById('loginEmail').value = email;
+    }, 1500);
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        currentUser = null;
+        currentClassroom = null;
+        localStorage.removeItem('currentDanceUser');
+        showNotification('Logged out successfully');
+        
+        setTimeout(() => {
+            showLoginScreen();
+        }, 1000);
+    }
+}
+
+// UI Navigation Functions
+function showLoginScreen() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    
+    // Clear form fields
+    document.querySelectorAll('input').forEach(input => {
+        if (input.type !== 'date') input.value = '';
+    });
+}
+
+function showMainApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    
+    // Update teacher name
+    document.getElementById('teacherName').textContent = currentUser.name;
+    
+    // Load classrooms and setup
+    loadUserClassrooms();
+    
     // Set today's date as default
     const today = new Date();
     const monday = getMonday(today);
     document.getElementById('weekDate').value = formatDate(monday);
+}
+
+// Classroom Management Functions
+function loadUserClassrooms() {
+    const userClassrooms = classrooms[currentUser.id] || {};
+    const classroomSelect = document.getElementById('classroomSelect');
     
-    // Initialize with smooth loading
+    classroomSelect.innerHTML = '<option value="">Select Classroom</option>';
+    
+    Object.values(userClassrooms).forEach(classroom => {
+        const option = document.createElement('option');
+        option.value = classroom.id;
+        option.textContent = `${classroom.name} (${classroom.level})`;
+        classroomSelect.appendChild(option);
+    });
+    
+    // If no classrooms exist, show welcome message
+    if (Object.keys(userClassrooms).length === 0) {
+        showWelcomeMessage();
+    }
+}
+
+function showWelcomeMessage() {
+    document.getElementById('classroomHeader').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('classroomTitle').textContent = 'Welcome to Dance Attendance!';
+    document.getElementById('classroomSubtitle').textContent = 'Create your first classroom to start tracking attendance';
+}
+
+function switchClassroom() {
+    const classroomId = document.getElementById('classroomSelect').value;
+    
+    if (!classroomId) {
+        showWelcomeMessage();
+        return;
+    }
+    
+    const userClassrooms = classrooms[currentUser.id] || {};
+    currentClassroom = userClassrooms[classroomId];
+    
+    if (!currentClassroom) {
+        showNotification('Classroom not found', 'error');
+        return;
+    }
+    
+    // Update header
+    document.getElementById('classroomHeader').style.display = 'block';
+    document.getElementById('classroomTitle').textContent = currentClassroom.name;
+    document.getElementById('classroomSubtitle').textContent = `${currentClassroom.level} Level${currentClassroom.description ? ' • ' + currentClassroom.description : ''}`;
+    
+    // Show main content
+    document.getElementById('mainContent').style.display = 'grid';
+    
+    // Load classroom data
+    loadClassroomData();
+}
+
+function loadClassroomData() {
+    if (!currentClassroom) return;
+    
+    // Load students and attendance for this classroom
+    students = currentClassroom.students || [];
+    attendanceRecords = currentClassroom.attendance || {};
+    
+    // Update UI
     setTimeout(() => {
         renderStudents();
         loadAttendanceForWeek();
         updateStatistics();
         populateHistoryDropdown();
     }, 100);
+}
+
+function saveClassroomData() {
+    if (!currentUser || !currentClassroom) return;
     
-    // Add modern keyboard shortcuts
-    setupKeyboardShortcuts();
+    // Update classroom data
+    currentClassroom.students = students;
+    currentClassroom.attendance = attendanceRecords;
+    currentClassroom.lastUpdated = new Date().toISOString();
     
-    // Add auto-save notifications
-    setupAutoSave();
-});
+    // Save to localStorage
+    if (!classrooms[currentUser.id]) {
+        classrooms[currentUser.id] = {};
+    }
+    classrooms[currentUser.id][currentClassroom.id] = currentClassroom;
+    localStorage.setItem('danceClassrooms', JSON.stringify(classrooms));
+}
+
+function showCreateClassroomModal() {
+    document.getElementById('createClassroomModal').style.display = 'flex';
+    document.getElementById('classroomName').focus();
+}
+
+function hideCreateClassroomModal() {
+    document.getElementById('createClassroomModal').style.display = 'none';
+    
+    // Clear form
+    document.getElementById('createClassroomForm').reset();
+}
+
+function handleCreateClassroom() {
+    const name = document.getElementById('classroomName').value.trim();
+    const description = document.getElementById('classroomDescription').value.trim();
+    const level = document.getElementById('classroomLevel').value;
+    
+    if (!name || !level) {
+        showNotification('Please fill in required fields', 'error');
+        return;
+    }
+    
+    // Create new classroom
+    const newClassroom = {
+        id: Date.now().toString(),
+        name: name,
+        description: description,
+        level: level,
+        students: [],
+        attendance: {},
+        dateCreated: new Date().toISOString(),
+        teacherId: currentUser.id
+    };
+    
+    // Save classroom
+    if (!classrooms[currentUser.id]) {
+        classrooms[currentUser.id] = {};
+    }
+    classrooms[currentUser.id][newClassroom.id] = newClassroom;
+    localStorage.setItem('danceClassrooms', JSON.stringify(classrooms));
+    
+    // Update UI
+    loadUserClassrooms();
+    document.getElementById('classroomSelect').value = newClassroom.id;
+    switchClassroom();
+    
+    hideCreateClassroomModal();
+    showNotification(`Classroom "${name}" created successfully!`);
+}
 
 // Modern utility functions
 function getMonday(date) {
@@ -96,8 +384,13 @@ function addLoadingState(element) {
     };
 }
 
-// Enhanced student management functions
+// Enhanced student management functions (updated for classroom system)
 function addStudent() {
+    if (!currentClassroom) {
+        showNotification('Please select a classroom first', 'error');
+        return;
+    }
+    
     const nameInput = document.getElementById('studentName');
     const name = nameInput.value.trim();
     
@@ -108,7 +401,7 @@ function addStudent() {
     }
     
     if (students.find(student => student.name.toLowerCase() === name.toLowerCase())) {
-        showNotification('Student already exists', 'error');
+        showNotification('Student already exists in this classroom', 'error');
         nameInput.focus();
         return;
     }
@@ -116,11 +409,12 @@ function addStudent() {
     const student = {
         id: Date.now().toString(),
         name: name,
-        dateAdded: new Date().toISOString()
+        dateAdded: new Date().toISOString(),
+        classroomId: currentClassroom.id
     };
     
     students.push(student);
-    saveStudents();
+    saveClassroomData();
     
     // Smooth UI updates
     setTimeout(() => {
@@ -128,7 +422,7 @@ function addStudent() {
         loadAttendanceForWeek();
         updateStatistics();
         populateHistoryDropdown();
-        showNotification(`${name} added successfully!`);
+        showNotification(`${name} added to ${currentClassroom.name}!`);
     }, 100);
     
     nameInput.value = '';
@@ -150,8 +444,7 @@ function removeStudent(studentId) {
         delete attendanceRecords[week][studentId];
     });
     
-    saveStudents();
-    saveAttendance();
+    saveClassroomData();
     
     // Smooth UI updates
     setTimeout(() => {
@@ -170,7 +463,7 @@ function renderStudents() {
         studentList.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-user-plus"></i>
-                <p>No students added yet.<br>Add your first student above!</p>
+                <p>No students in this classroom yet.<br>Add your first student above!</p>
             </div>
         `;
         return;
@@ -190,18 +483,28 @@ function renderStudents() {
     `).join('');
 }
 
-// Enhanced attendance management functions
+// Enhanced attendance management functions (updated for classroom system)
 function loadAttendanceForWeek() {
     const weekDate = document.getElementById('weekDate').value;
     if (!weekDate) return;
     
     const attendanceGrid = document.getElementById('attendanceGrid');
     
+    if (!currentClassroom) {
+        attendanceGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <p>Please select a classroom first</p>
+            </div>
+        `;
+        return;
+    }
+    
     if (students.length === 0) {
         attendanceGrid.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-users"></i>
-                <p>Add students first to track attendance</p>
+                <p>Add students to this classroom to track attendance</p>
             </div>
         `;
         return;
@@ -226,6 +529,11 @@ function loadAttendanceForWeek() {
 }
 
 function markAttendanceForWeek() {
+    if (!currentClassroom) {
+        showNotification('Please select a classroom first', 'error');
+        return;
+    }
+    
     const weekDate = document.getElementById('weekDate').value;
     if (!weekDate) {
         showNotification('Please select a week date', 'error');
@@ -248,7 +556,7 @@ function markAttendanceForWeek() {
             attendanceRecords[weekKey][studentId] = checkbox.checked;
         });
         
-        saveAttendance();
+        saveClassroomData();
         updateStatistics();
         
         removeLoading();
@@ -262,7 +570,7 @@ function markAttendanceForWeek() {
             button.style.background = '';
         }, 2000);
         
-        showNotification('Attendance saved successfully!');
+        showNotification(`Attendance saved for ${currentClassroom.name}!`);
     }, 500);
 }
 
@@ -443,7 +751,51 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Enhanced keyboard shortcuts and auto-save
+// Enhanced export function (updated for classroom system)
+function exportData() {
+    if (!currentClassroom) {
+        showNotification('Please select a classroom first', 'error');
+        return;
+    }
+    
+    const button = event.target.closest('button');
+    const removeLoading = addLoadingState(button);
+    
+    setTimeout(() => {
+        const data = {
+            classroom: {
+                name: currentClassroom.name,
+                level: currentClassroom.level,
+                description: currentClassroom.description
+            },
+            teacher: {
+                name: currentUser.name,
+                school: currentUser.school
+            },
+            students: students,
+            attendance: attendanceRecords,
+            exportDate: new Date().toISOString(),
+            totalStudents: students.length,
+            totalClasses: Object.keys(attendanceRecords).length,
+            appVersion: '3.0'
+        };
+        
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `${currentClassroom.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-attendance-${formatDate(new Date())}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        removeLoading();
+        showNotification(`${currentClassroom.name} data exported successfully!`);
+    }, 500);
+}
+
+// Enhanced keyboard shortcuts and auto-save (updated for classroom system)
 function setupKeyboardShortcuts() {
     document.addEventListener('keydown', function(event) {
         // Ctrl/Cmd + Enter to add student
@@ -453,10 +805,15 @@ function setupKeyboardShortcuts() {
             }
         }
         
-        // Escape to clear input
+        // Escape to clear input or close modals
         if (event.key === 'Escape') {
             if (document.activeElement.id === 'studentName') {
                 document.getElementById('studentName').value = '';
+            }
+            
+            // Close modals
+            if (document.getElementById('createClassroomModal').style.display === 'flex') {
+                hideCreateClassroomModal();
             }
         }
         
@@ -464,6 +821,14 @@ function setupKeyboardShortcuts() {
         if ((event.ctrlKey || event.metaKey) && event.key === 's') {
             event.preventDefault();
             markAttendanceForWeek();
+        }
+        
+        // Ctrl/Cmd + N to create new classroom
+        if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
+            event.preventDefault();
+            if (currentUser) {
+                showCreateClassroomModal();
+            }
         }
     });
 }
@@ -482,36 +847,6 @@ function setupAutoSave() {
             }, 1000);
         }
     });
-}
-
-// Enhanced export function
-function exportData() {
-    const button = event.target.closest('button');
-    const removeLoading = addLoadingState(button);
-    
-    setTimeout(() => {
-        const data = {
-            students: students,
-            attendance: attendanceRecords,
-            exportDate: new Date().toISOString(),
-            totalStudents: students.length,
-            totalClasses: Object.keys(attendanceRecords).length,
-            appVersion: '2.0'
-        };
-        
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataBlob = new Blob([dataStr], {type: 'application/json'});
-        
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(dataBlob);
-        link.download = `dance-attendance-${formatDate(new Date())}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        removeLoading();
-        showNotification('Data exported successfully!');
-    }, 500);
 }
 
 // Add notification styles to document
