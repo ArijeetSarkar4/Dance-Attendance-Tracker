@@ -41,17 +41,25 @@ This KUSA Dance Attendance app can be hosted on any web server or platform like 
 - `styles.css` - ADA-compliant styling and responsive design
 - `script.js` - Application logic for attendance tracking and teacher management
 - `kusa-logo.svg` - KUSA Dance logo (SVG format for scalability)
+- `kathak-login.png` - Beautiful Kathak/Nataraja background image for login screen
 - `README.md` - This documentation file
 - `DEPLOYMENT_GUIDE.md` - Detailed deployment instructions
 
-## Logo Customization
+## Visual Customization
 
-The app includes a placeholder KUSA logo (`kusa-logo.svg`). To replace it with your actual KUSA logo:
+The app includes beautiful visual elements that can be customized:
 
-1. Replace `kusa-logo.svg` with your official logo file
-2. Supported formats: SVG (recommended), PNG, JPG
-3. Recommended size: 120x40px for navigation, 200x60px for login
-4. Update the filename in `index.html` if using a different format
+### Logo Customization
+- Replace `kusa-logo.svg` with your official logo file
+- Supported formats: SVG (recommended), PNG, JPG
+- Recommended size: 120x40px for navigation, 200x60px for login
+- Update the filename in `index.html` if using a different format
+
+### Background Image
+- The login screen features a beautiful Kathak/Nataraja background (`kathak-login.png`)
+- Replace with your own dance-themed background if desired
+- Recommended size: 1920x1080px or higher resolution
+- Supported formats: PNG, JPG, WebP
 
 ## Browser Compatibility
 
