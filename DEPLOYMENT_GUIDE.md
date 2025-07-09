@@ -1,6 +1,6 @@
-# How to Deploy Your Dance Attendance App to GitHub Pages
+# How to Deploy Your KUSA Dance Attendance App to GitHub Pages
 
-Follow these steps to create a public URL for your app that you can share with other teachers.
+Follow these steps to create a public URL for your KUSA Dance Attendance app that you can share with other teachers.
 
 ## Step 1: Create a GitHub Account
 1. Go to [github.com](https://github.com)
@@ -10,7 +10,7 @@ Follow these steps to create a public URL for your app that you can share with o
 ## Step 2: Create a New Repository
 1. After logging in, click the "+" icon in the top right corner
 2. Select "New repository"
-3. Name your repository: `dance-attendance-tracker`
+3. Name your repository: `kusa-dance-attendance-tracker`
 4. Make sure it's set to "Public"
 5. Check "Add a README file"
 6. Click "Create repository"
@@ -21,7 +21,10 @@ Follow these steps to create a public URL for your app that you can share with o
    - `index.html`
    - `styles.css`
    - `script.js`
-3. Write a commit message like "Add dance attendance tracker files"
+   - `kusa-logo.svg` (or your custom logo file)
+   - `README.md` (optional)
+   - `DEPLOYMENT_GUIDE.md` (optional)
+3. Write a commit message like "Add KUSA Dance attendance tracker files"
 4. Click "Commit changes"
 
 ## Step 4: Enable GitHub Pages
@@ -34,7 +37,7 @@ Follow these steps to create a public URL for your app that you can share with o
 ## Step 5: Get Your Public URL
 1. Wait 2-3 minutes for deployment
 2. Your app will be available at:
-   `https://[your-username].github.io/dance-attendance-tracker`
+   `https://[your-username].github.io/kusa-dance-attendance-tracker`
 3. GitHub will show you the exact URL in the Pages settings
 
 ## Alternative Quick Deployment Options
@@ -72,4 +75,4 @@ Follow these steps to create a public URL for your app that you can share with o
 - Make sure all file names are exactly: `index.html`, `styles.css`, `script.js`
 - Check that the repository is public, not private
 
-Your app will be live and shareable within minutes using any of these methods!
+Your KUSA Dance Attendance app will be live and shareable within minutes using any of these methods!

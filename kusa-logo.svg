@@ -1,0 +1,11 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="20" cy="20" r="18" fill="#1d4ed8" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Stylized K -->
+  <path d="M12 10 L12 30 M12 20 L22 10 M12 20 L22 30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Text -->
+  <text x="45" y="16" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#1d4ed8">KUSA</text>
+  <text x="45" y="30" font-family="Inter, sans-serif" font-size="8" font-weight="500" fill="#374151">DANCE</text>
+</svg>
