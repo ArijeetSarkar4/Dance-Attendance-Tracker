@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance Class Attendance Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-music"></i> Dance Class Attendance Tracker</h1>
+            <p>Track your students' weekly attendance with ease</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Student Management Section -->
+            <section class="student-section">
+                <h2><i class="fas fa-users"></i> Student Management</h2>
+                <div class="add-student-form">
+                    <input type="text" id="studentName" placeholder="Enter student name" maxlength="50">
+                    <button onclick="addStudent()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                </div>
+                <div class="student-list" id="studentList">
+                    <!-- Students will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Attendance Section -->
+            <section class="attendance-section">
+                <h2><i class="fas fa-calendar-check"></i> Weekly Attendance</h2>
+                <div class="week-selector">
+                    <label for="weekDate">Select Week:</label>
+                    <input type="date" id="weekDate" onchange="loadAttendanceForWeek()">
+                    <button onclick="markAttendanceForWeek()" class="btn btn-success">
+                        <i class="fas fa-check"></i> Save Attendance
+                    </button>
+                </div>
+                <div class="attendance-grid" id="attendanceGrid">
+                    <!-- Attendance checkboxes will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <h2><i class="fas fa-chart-bar"></i> Attendance Statistics</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Statistics will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="history-section">
+                <h2><i class="fas fa-history"></i> Attendance History</h2>
+                <div class="history-controls">
+                    <select id="historyStudent" onchange="loadStudentHistory()">
+                        <option value="">Select a student</option>
+                    </select>
+                    <button onclick="exportData()" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+                <div class="history-display" id="historyDisplay">
+                    <!-- History will be displayed here -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
