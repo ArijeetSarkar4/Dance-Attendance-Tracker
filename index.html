@@ -6,64 +6,91 @@
     <title>Dance Class Attendance Tracker</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Track your dance students' weekly attendance with ease">
+    <meta name="theme-color" content="#6366f1">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-music"></i> Dance Class Attendance Tracker</h1>
+            <h1><i class="fas fa-music" aria-hidden="true"></i> Dance Class Attendance Tracker</h1>
             <p>Track your students' weekly attendance with ease</p>
         </header>
 
         <div class="main-content">
             <!-- Student Management Section -->
-            <section class="student-section">
-                <h2><i class="fas fa-users"></i> Student Management</h2>
+            <section class="student-section" aria-label="Student Management">
+                <h2><i class="fas fa-users" aria-hidden="true"></i> Student Management</h2>
                 <div class="add-student-form">
-                    <input type="text" id="studentName" placeholder="Enter student name" maxlength="50">
-                    <button onclick="addStudent()" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add Student
+                    <input 
+                        type="text" 
+                        id="studentName" 
+                        placeholder="Enter student name" 
+                        maxlength="50"
+                        aria-label="Student name"
+                        autocomplete="off">
+                    <button 
+                        onclick="addStudent()" 
+                        class="btn btn-primary"
+                        aria-label="Add new student">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add Student
                     </button>
                 </div>
-                <div class="student-list" id="studentList">
+                <div class="student-list" id="studentList" role="list" aria-label="List of students">
                     <!-- Students will be dynamically added here -->
                 </div>
             </section>
 
             <!-- Attendance Section -->
-            <section class="attendance-section">
-                <h2><i class="fas fa-calendar-check"></i> Weekly Attendance</h2>
+            <section class="attendance-section" aria-label="Weekly Attendance">
+                <h2><i class="fas fa-calendar-check" aria-hidden="true"></i> Weekly Attendance</h2>
                 <div class="week-selector">
                     <label for="weekDate">Select Week:</label>
-                    <input type="date" id="weekDate" onchange="loadAttendanceForWeek()">
-                    <button onclick="markAttendanceForWeek()" class="btn btn-success">
-                        <i class="fas fa-check"></i> Save Attendance
+                    <input 
+                        type="date" 
+                        id="weekDate" 
+                        onchange="loadAttendanceForWeek()"
+                        aria-label="Select week for attendance">
+                    <button 
+                        onclick="markAttendanceForWeek()" 
+                        class="btn btn-success"
+                        data-tooltip="Save attendance for selected week">
+                        <i class="fas fa-check" aria-hidden="true"></i> Save Attendance
                     </button>
                 </div>
-                <div class="attendance-grid" id="attendanceGrid">
+                <div class="attendance-grid" id="attendanceGrid" role="group" aria-label="Student attendance checkboxes">
                     <!-- Attendance checkboxes will be dynamically added here -->
                 </div>
             </section>
 
             <!-- Statistics Section -->
-            <section class="stats-section">
-                <h2><i class="fas fa-chart-bar"></i> Attendance Statistics</h2>
-                <div class="stats-grid" id="statsGrid">
+            <section class="stats-section" aria-label="Attendance Statistics">
+                <h2><i class="fas fa-chart-bar" aria-hidden="true"></i> Attendance Statistics</h2>
+                <div class="stats-grid" id="statsGrid" role="list" aria-label="Attendance statistics">
                     <!-- Statistics will be dynamically added here -->
                 </div>
             </section>
 
             <!-- History Section -->
-            <section class="history-section">
-                <h2><i class="fas fa-history"></i> Attendance History</h2>
+            <section class="history-section" aria-label="Attendance History">
+                <h2><i class="fas fa-history" aria-hidden="true"></i> Attendance History</h2>
                 <div class="history-controls">
-                    <select id="historyStudent" onchange="loadStudentHistory()">
+                    <select 
+                        id="historyStudent" 
+                        onchange="loadStudentHistory()"
+                        aria-label="Select student to view history">
                         <option value="">Select a student</option>
                     </select>
-                    <button onclick="exportData()" class="btn btn-secondary">
-                        <i class="fas fa-download"></i> Export Data
+                    <button 
+                        onclick="exportData()" 
+                        class="btn btn-secondary"
+                        data-tooltip="Download attendance data as JSON file">
+                        <i class="fas fa-download" aria-hidden="true"></i> Export Data
                     </button>
                 </div>
-                <div class="history-display" id="historyDisplay">
+                <div class="history-display" id="historyDisplay" aria-live="polite" aria-label="Student attendance history">
                     <!-- History will be displayed here -->
                 </div>
             </section>

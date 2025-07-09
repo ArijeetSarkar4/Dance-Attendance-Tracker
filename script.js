@@ -9,13 +9,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const monday = getMonday(today);
     document.getElementById('weekDate').value = formatDate(monday);
     
-    renderStudents();
-    loadAttendanceForWeek();
-    updateStatistics();
-    populateHistoryDropdown();
+    // Initialize with smooth loading
+    setTimeout(() => {
+        renderStudents();
+        loadAttendanceForWeek();
+        updateStatistics();
+        populateHistoryDropdown();
+    }, 100);
+    
+    // Add modern keyboard shortcuts
+    setupKeyboardShortcuts();
+    
+    // Add auto-save notifications
+    setupAutoSave();
 });
 
-// Utility functions
+// Modern utility functions
 function getMonday(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -36,18 +45,71 @@ function formatDisplayDate(dateString) {
     });
 }
 
-// Student management functions
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add styles
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        background: type === 'success' ? 'var(--success-color)' : 'var(--danger-color)',
+        color: 'white',
+        padding: '1rem 1.5rem',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-lg)',
+        zIndex: '9999',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        animation: 'slideInRight 0.3s ease',
+        maxWidth: '300px'
+    });
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function addLoadingState(element) {
+    element.classList.add('loading');
+    const originalContent = element.innerHTML;
+    element.disabled = true;
+    return () => {
+        element.classList.remove('loading');
+        element.innerHTML = originalContent;
+        element.disabled = false;
+    };
+}
+
+// Enhanced student management functions
 function addStudent() {
     const nameInput = document.getElementById('studentName');
     const name = nameInput.value.trim();
     
     if (!name) {
-        alert('Please enter a student name');
+        showNotification('Please enter a student name', 'error');
+        nameInput.focus();
         return;
     }
     
     if (students.find(student => student.name.toLowerCase() === name.toLowerCase())) {
-        alert('Student already exists');
+        showNotification('Student already exists', 'error');
+        nameInput.focus();
         return;
     }
     
@@ -59,17 +121,25 @@ function addStudent() {
     
     students.push(student);
     saveStudents();
-    renderStudents();
-    loadAttendanceForWeek();
-    updateStatistics();
-    populateHistoryDropdown();
+    
+    // Smooth UI updates
+    setTimeout(() => {
+        renderStudents();
+        loadAttendanceForWeek();
+        updateStatistics();
+        populateHistoryDropdown();
+        showNotification(`${name} added successfully!`);
+    }, 100);
     
     nameInput.value = '';
     nameInput.focus();
 }
 
 function removeStudent(studentId) {
-    if (!confirm('Are you sure you want to remove this student? This will also delete all attendance records.')) {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+    
+    if (!confirm(`Are you sure you want to remove ${student.name}? This will also delete all attendance records.`)) {
         return;
     }
     
@@ -82,31 +152,45 @@ function removeStudent(studentId) {
     
     saveStudents();
     saveAttendance();
-    renderStudents();
-    loadAttendanceForWeek();
-    updateStatistics();
-    populateHistoryDropdown();
+    
+    // Smooth UI updates
+    setTimeout(() => {
+        renderStudents();
+        loadAttendanceForWeek();
+        updateStatistics();
+        populateHistoryDropdown();
+        showNotification(`${student.name} removed successfully`);
+    }, 100);
 }
 
 function renderStudents() {
     const studentList = document.getElementById('studentList');
     
     if (students.length === 0) {
-        studentList.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><br>No students added yet. Add your first student above!</div>';
+        studentList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-user-plus"></i>
+                <p>No students added yet.<br>Add your first student above!</p>
+            </div>
+        `;
         return;
     }
     
-    studentList.innerHTML = students.map(student => `
-        <div class="student-item">
+    studentList.innerHTML = students.map((student, index) => `
+        <div class="student-item" style="animation-delay: ${index * 0.1}s" role="listitem">
             <div class="student-name">${escapeHtml(student.name)}</div>
-            <button onclick="removeStudent('${student.id}')" class="btn btn-danger">
-                <i class="fas fa-trash"></i>
+            <button 
+                onclick="removeStudent('${student.id}')" 
+                class="btn btn-danger"
+                aria-label="Remove ${escapeHtml(student.name)}"
+                data-tooltip="Remove student">
+                <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
         </div>
     `).join('');
 }
 
-// Attendance management functions
+// Enhanced attendance management functions
 function loadAttendanceForWeek() {
     const weekDate = document.getElementById('weekDate').value;
     if (!weekDate) return;
@@ -114,15 +198,20 @@ function loadAttendanceForWeek() {
     const attendanceGrid = document.getElementById('attendanceGrid');
     
     if (students.length === 0) {
-        attendanceGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><br>Add students first to track attendance</div>';
+        attendanceGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <p>Add students first to track attendance</p>
+            </div>
+        `;
         return;
     }
     
     const weekKey = weekDate;
     const weekAttendance = attendanceRecords[weekKey] || {};
     
-    attendanceGrid.innerHTML = students.map(student => `
-        <div class="attendance-item">
+    attendanceGrid.innerHTML = students.map((student, index) => `
+        <div class="attendance-item" style="animation-delay: ${index * 0.05}s">
             <label for="attendance-${student.id}" class="student-name">${escapeHtml(student.name)}</label>
             <input 
                 type="checkbox" 
@@ -130,6 +219,7 @@ function loadAttendanceForWeek() {
                 class="attendance-checkbox"
                 ${weekAttendance[student.id] ? 'checked' : ''}
                 data-student-id="${student.id}"
+                aria-label="Mark attendance for ${escapeHtml(student.name)}"
             >
         </div>
     `).join('');
@@ -138,35 +228,42 @@ function loadAttendanceForWeek() {
 function markAttendanceForWeek() {
     const weekDate = document.getElementById('weekDate').value;
     if (!weekDate) {
-        alert('Please select a week date');
+        showNotification('Please select a week date', 'error');
         return;
     }
     
-    const weekKey = weekDate;
-    const checkboxes = document.querySelectorAll('.attendance-checkbox');
-    
-    if (!attendanceRecords[weekKey]) {
-        attendanceRecords[weekKey] = {};
-    }
-    
-    checkboxes.forEach(checkbox => {
-        const studentId = checkbox.dataset.studentId;
-        attendanceRecords[weekKey][studentId] = checkbox.checked;
-    });
-    
-    saveAttendance();
-    updateStatistics();
-    
-    // Show success message
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-check"></i> Saved!';
-    button.style.background = '#38a169';
+    const button = event.target.closest('button');
+    const removeLoading = addLoadingState(button);
     
     setTimeout(() => {
-        button.innerHTML = originalText;
-        button.style.background = '';
-    }, 2000);
+        const weekKey = weekDate;
+        const checkboxes = document.querySelectorAll('.attendance-checkbox');
+        
+        if (!attendanceRecords[weekKey]) {
+            attendanceRecords[weekKey] = {};
+        }
+        
+        checkboxes.forEach(checkbox => {
+            const studentId = checkbox.dataset.studentId;
+            attendanceRecords[weekKey][studentId] = checkbox.checked;
+        });
+        
+        saveAttendance();
+        updateStatistics();
+        
+        removeLoading();
+        
+        // Enhanced success feedback
+        button.innerHTML = '<i class="fas fa-check"></i> Saved!';
+        button.style.background = 'var(--success-hover)';
+        
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-check"></i> Save Attendance';
+            button.style.background = '';
+        }, 2000);
+        
+        showNotification('Attendance saved successfully!');
+    }, 500);
 }
 
 // Statistics functions
@@ -346,20 +443,100 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Keyboard shortcuts
-document.addEventListener('keydown', function(event) {
-    // Enter key in student name input
-    if (event.target.id === 'studentName' && event.key === 'Enter') {
-        addStudent();
-    }
-});
-
-// Auto-save functionality for attendance checkboxes
-document.addEventListener('change', function(event) {
-    if (event.target.classList.contains('attendance-checkbox')) {
-        // Auto-save after a short delay
-        setTimeout(() => {
+// Enhanced keyboard shortcuts and auto-save
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(event) {
+        // Ctrl/Cmd + Enter to add student
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            if (document.activeElement.id === 'studentName') {
+                addStudent();
+            }
+        }
+        
+        // Escape to clear input
+        if (event.key === 'Escape') {
+            if (document.activeElement.id === 'studentName') {
+                document.getElementById('studentName').value = '';
+            }
+        }
+        
+        // Ctrl/Cmd + S to save attendance
+        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+            event.preventDefault();
             markAttendanceForWeek();
-        }, 500);
+        }
+    });
+}
+
+function setupAutoSave() {
+    let autoSaveTimeout;
+    
+    document.addEventListener('change', function(event) {
+        if (event.target.classList.contains('attendance-checkbox')) {
+            // Clear existing timeout
+            clearTimeout(autoSaveTimeout);
+            
+            // Auto-save after 1 second of inactivity
+            autoSaveTimeout = setTimeout(() => {
+                markAttendanceForWeek();
+            }, 1000);
+        }
+    });
+}
+
+// Enhanced export function
+function exportData() {
+    const button = event.target.closest('button');
+    const removeLoading = addLoadingState(button);
+    
+    setTimeout(() => {
+        const data = {
+            students: students,
+            attendance: attendanceRecords,
+            exportDate: new Date().toISOString(),
+            totalStudents: students.length,
+            totalClasses: Object.keys(attendanceRecords).length,
+            appVersion: '2.0'
+        };
+        
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `dance-attendance-${formatDate(new Date())}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        removeLoading();
+        showNotification('Data exported successfully!');
+    }, 500);
+}
+
+// Add notification styles to document
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
-});
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
