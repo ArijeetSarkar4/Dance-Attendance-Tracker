@@ -9,9 +9,11 @@ A simple, web-based attendance tracking application for KUSA dance classes.
 - 📊 **Statistics**: View overall attendance statistics and identify most consistent students
 - 📈 **History Tracking**: View individual student attendance history over time
 - 💾 **Data Export**: Export all data as JSON for backup purposes
-- 📱 **Responsive Design**: Works on desktop, tablet, and mobile devices
+- 📱 **Fully Responsive**: Seamlessly adapts to all screen sizes from mobile to desktop
+- ♿ **ADA Compliant**: WCAG 2.1 AA/AAA accessibility standards
 - 🔐 **Multi-Teacher Support**: Secure login system for multiple teachers
 - 🏫 **Multi-Classroom**: Each teacher can manage multiple classrooms
+- 🎨 **Beautiful UI**: Modern design with Kathak-inspired visuals
 
 ## How to Use
 
@@ -42,6 +44,7 @@ This KUSA Dance Attendance app can be hosted on any web server or platform like 
 - `script.js` - Application logic for attendance tracking and teacher management
 - `kusa-logo.svg` - KUSA Dance logo (SVG format for scalability)
 - `kathak-login.png` - Beautiful Kathak/Nataraja background image for login screen
+- `klathak-ghungroo.png` - Elegant ghungroo background image for main application
 - `README.md` - This documentation file
 - `DEPLOYMENT_GUIDE.md` - Detailed deployment instructions
 
@@ -55,9 +58,12 @@ The app includes beautiful visual elements that can be customized:
 - Recommended size: 120x40px for navigation, 200x60px for login
 - Update the filename in `index.html` if using a different format
 
-### Background Image
-- The login screen features a beautiful Kathak/Nataraja background (`kathak-login.png`)
-- Replace with your own dance-themed background if desired
+### Background Images
+The app features beautiful Kathak-themed backgrounds:
+
+- **Login Screen**: Stunning Kathak/Nataraja background (`kathak-login.png`)
+- **Main Application**: Elegant ghungroo (ankle bells) background (`klathak-ghungroo.png`)
+- Replace with your own dance-themed backgrounds if desired
 - Recommended size: 1920x1080px or higher resolution
 - Supported formats: PNG, JPG, WebP
 

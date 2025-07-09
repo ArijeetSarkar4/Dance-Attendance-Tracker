@@ -80,15 +80,89 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--background);
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
     color: var(--text-primary);
     line-height: 1.6;
     font-size: 16px; /* Minimum 16px for accessibility */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    width: 100%;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Scroll Behavior and Viewport Optimizations */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* Ensure proper box-sizing for all elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-hover);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+}
+
+/* Improve focus visibility on all screen sizes */
+*:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Modern App Layout */
+/* Main App Layout */
+.main-app {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+    background: var(--background);
+    background-image: url('klathak-ghungroo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.main-app::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: -1;
+    pointer-events: none;
 }
 
 header {
@@ -116,16 +190,35 @@ header p {
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
+    flex: 1;
+    min-height: 0; /* Allow content to shrink if needed */
+    overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.container .main-content {
+    height: calc(100vh - 80px); /* Account for navbar height */
+    height: calc(100dvh - 80px);
+    overflow-y: auto;
+    padding-bottom: 2rem; /* Extra space at bottom */
 }
 
 section {
     background: var(--surface);
+    background: rgba(255, 255, 255, 0.92);
     border-radius: var(--radius-xl);
     padding: 2rem;
-    box-shadow: var(--shadow-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto; /* Allow horizontal scroll if needed for tables/grids */
+    position: relative;
+    z-index: 1;
 }
 
 section:hover {
@@ -150,10 +243,13 @@ section h2 {
     display: flex;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .add-student-form input {
     flex: 1;
+    min-width: 200px; /* Ensure minimum width on small screens */
     padding: 0.875rem 1rem;
     border: 2px solid var(--border);
     border-radius: var(--radius-lg);
@@ -163,6 +259,7 @@ section h2 {
     background: var(--surface);
     color: var(--text-primary);
     min-height: 44px; /* Minimum touch target */
+    box-sizing: border-box;
 }
 
 .add-student-form input:focus {
@@ -340,6 +437,8 @@ section h2 {
     background: var(--surface-hover);
     border-radius: var(--radius-lg);
     border: 2px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .week-selector label {
@@ -374,6 +473,16 @@ textarea:focus {
 .stats-grid {
     display: grid;
     gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.attendance-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .attendance-checkbox {
@@ -611,15 +720,20 @@ textarea:focus {
 /* App Navigation - ADA Compliant */
 .app-navbar {
     background: var(--surface);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
     border-bottom: 2px solid var(--border);
     padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255, 255, 255, 0.2);
     position: sticky;
     top: 0;
     z-index: 100;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0; /* Prevent navbar from shrinking */
 }
 
 .nav-left {
@@ -681,15 +795,35 @@ textarea:focus {
     min-height: 36px;
 }
 
+/* Main Content Area - Responsive Layout */
+.main-content {
+    flex: 1;
+    min-height: 0; /* Allow content to shrink if needed */
+    overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.container .main-content {
+    height: calc(100vh - 80px); /* Account for navbar height */
+    height: calc(100dvh - 80px);
+    overflow-y: auto;
+    padding-bottom: 2rem; /* Extra space at bottom */
+}
+
 /* Classroom Header - ADA Compliant */
 .classroom-header {
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem;
     background: var(--surface);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.2);
     border: 2px solid var(--border);
+    position: relative;
+    z-index: 1;
 }
 
 .classroom-header h1 {
@@ -776,6 +910,130 @@ textarea:focus {
     margin-top: 2rem;
 }
 
+/* Scroll Behavior and Viewport Optimizations */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* Ensure proper box-sizing for all elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-hover);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+}
+
+/* Improve focus visibility on all screen sizes */
+*:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Ultra-wide screen optimizations */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1600px;
+        padding: 3rem;
+    }
+    
+    section {
+        padding: 2.5rem;
+    }
+    
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 360px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    section {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .classroom-header {
+        padding: 1rem;
+    }
+    
+    .app-navbar {
+        padding: 0.5rem;
+    }
+    
+    .nav-left .nav-logo {
+        height: 24px;
+    }
+    
+    .btn {
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .add-student-form input {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Large tablet and desktop improvements */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+/* Print styles */
+@media print {
+    .app-navbar,
+    .btn,
+    .modal {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+    
+    section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
 /* Logo Styles - KUSA Branding */
 .logo-container {
     display: flex;
@@ -852,10 +1110,16 @@ textarea:focus {
         flex-direction: column;
     }
     
+    .add-student-form input {
+        min-width: unset;
+        width: 100%;
+    }
+    
     .week-selector,
     .history-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.75rem;
     }
     
     .week-selector input,
@@ -865,8 +1129,26 @@ textarea:focus {
         width: 100%;
     }
     
+    .attendance-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
     section {
         padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .classroom-header {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 2rem;
     }
     
     header h1 {
@@ -902,8 +1184,55 @@ textarea:focus {
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+    
+    section {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .classroom-header {
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.75rem;
+    }
+    
     .nav-left .app-title {
         display: none; /* Hide app title on very small screens */
+    }
+    
+    .classroom-selector {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .classroom-selector select {
+        min-width: unset;
+        width: 100%;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.925rem;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.825rem;
+    }
+    
+    /* Improve text sizes on very small screens */
+    section h2 {
+        font-size: 1.25rem;
+    }
+    
+    .week-selector label {
+        font-size: 0.9rem;
     }
     
     .classroom-selector {
@@ -1120,4 +1449,49 @@ textarea:focus-visible {
     white-space: nowrap;
     z-index: 1000;
     animation: fadeIn 0.2s ease;
+}
+
+/* Main App Background - Mobile Responsive */
+@media (max-width: 768px) {
+    .main-app {
+        background-attachment: scroll; /* Better performance on mobile */
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .main-app::before {
+        background: rgba(255, 255, 255, 0.88); /* Slightly more opaque on mobile for readability */
+    }
+    
+    section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+    }
+    
+    .app-navbar {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+    }
+    
+    .classroom-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
+}
+
+@media (max-width: 480px) {
+    .main-app::before {
+        background: rgba(255, 255, 255, 0.92); /* Even more opaque on very small screens */
+    }
+    
+    section {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(6px);
+    }
+    
+    .app-navbar,
+    .classroom-header {
+        background: rgba(255, 255, 255, 1); /* Solid background on very small screens */
+        backdrop-filter: none;
+    }
 }
