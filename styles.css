@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
 }
 
 :root {
@@ -74,8 +75,27 @@
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
+    
+    /* Fluid Typography - Responsive Font Scaling */
+    --font-xs: clamp(0.7rem, 0.5vw + 0.6rem, 0.875rem);
+    --font-sm: clamp(0.8rem, 0.6vw + 0.7rem, 1rem);
+    --font-base: clamp(0.9rem, 0.8vw + 0.8rem, 1.125rem);
+    --font-lg: clamp(1rem, 1vw + 0.9rem, 1.25rem);
+    --font-xl: clamp(1.125rem, 1.2vw + 1rem, 1.5rem);
+    --font-2xl: clamp(1.25rem, 1.5vw + 1.1rem, 1.875rem);
+    --font-3xl: clamp(1.5rem, 2vw + 1.2rem, 2.25rem);
+    --font-4xl: clamp(1.875rem, 2.5vw + 1.4rem, 3rem);
+    --font-5xl: clamp(2.25rem, 3vw + 1.6rem, 3.75rem);
+    
+    /* Fluid spacing */
+    --space-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+    --space-sm: clamp(0.5rem, 1vw, 1rem);
+    --space-md: clamp(1rem, 2vw, 2rem);
+    --space-lg: clamp(1.5rem, 3vw, 3rem);
+    --space-xl: clamp(2rem, 4vw, 4rem);
 }
 
+/* Enhanced Body and Scroll Styles */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--background);
@@ -83,25 +103,64 @@ body {
     min-height: 100dvh; /* Dynamic viewport height for mobile */
     color: var(--text-primary);
     line-height: 1.6;
-    font-size: 16px; /* Minimum 16px for accessibility */
+    font-size: var(--font-base);
     margin: 0;
     padding: 0;
     overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-y: auto; /* Enable vertical scrolling */
     width: 100%;
+    position: relative;
+}
+
+/* Enhanced scroll behavior */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+
+/* Apply fluid typography */
+body {
+    font-size: var(--font-base);
+}
+
+h1 {
+    font-size: var(--font-4xl);
+}
+
+h2 {
+    font-size: var(--font-2xl);
+}
+
+h3 {
+    font-size: var(--font-xl);
+}
+
+.btn {
+    font-size: var(--font-sm);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.btn-sm {
+    font-size: var(--font-xs);
+    padding: var(--space-xs) var(--space-sm);
+}
+
+section {
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: var(--space-md);
     width: 100%;
     box-sizing: border-box;
-}
-
-/* Scroll Behavior and Viewport Optimizations */
-html {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+    flex: 1; /* Allow container to grow and fill available space */
+    overflow-y: auto; /* Enable scrolling within container */
+    min-height: 0; /* Allow flex shrinking */
 }
 
 /* Ensure proper box-sizing for all elements */
@@ -144,6 +203,7 @@ html {
     flex-direction: column;
     width: 100%;
     overflow-x: hidden;
+    overflow-y: auto; /* Enable vertical scrolling for main app */
     background: var(--background);
     background-image: url('klathak-ghungroo.png');
     background-size: cover;
@@ -192,16 +252,18 @@ header p {
     margin-bottom: 2rem;
     flex: 1;
     min-height: 0; /* Allow content to shrink if needed */
-    overflow-y: auto;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scroll issues */
     width: 100%;
     box-sizing: border-box;
+    padding-bottom: var(--space-lg); /* Extra space at bottom for scrolling */
 }
 
 .container .main-content {
-    height: calc(100vh - 80px); /* Account for navbar height */
-    height: calc(100dvh - 80px);
     overflow-y: auto;
+    overflow-x: hidden;
     padding-bottom: 2rem; /* Extra space at bottom */
+    max-height: none; /* Remove height restrictions to allow natural flow */
 }
 
 section {
@@ -575,6 +637,8 @@ textarea:focus {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    overflow-y: auto; /* Enable scrolling if content overflows */
+    overflow-x: hidden;
 }
 
 .login-screen::before {
@@ -597,9 +661,12 @@ textarea:focus {
     box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 450px;
+    max-height: 90vh; /* Prevent login form from exceeding viewport */
     border: 2px solid var(--border);
     position: relative;
     z-index: 10;
+    overflow-y: auto; /* Enable scrolling within login form if needed */
+    margin: 1rem; /* Add margin for better mobile spacing */
 }
 
 .login-header {
@@ -910,51 +977,90 @@ textarea:focus {
     margin-top: 2rem;
 }
 
-/* Scroll Behavior and Viewport Optimizations */
-html {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+/* iOS Momentum Scrolling and Scroll Improvements */
+/* Prevent scroll bounce on iOS */
+body {
+    position: relative;
+    overflow: auto;
 }
 
-/* Ensure proper box-sizing for all elements */
-*, *::before, *::after {
-    box-sizing: border-box;
+/* Fix for Safari mobile scrolling issues */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: 100vh;
+        height: 100dvh;
+        overflow: auto;
+    }
+    
+    .main-app {
+        height: 100vh;
+        height: 100dvh;
+        overflow: auto;
+    }
 }
 
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-    width: 8px;
+/* Ensure proper touch scrolling on all interactive elements */
+.attendance-grid,
+.stats-grid,
+.student-list,
+.history-display {
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
 }
 
-::-webkit-scrollbar-track {
-    background: var(--surface-hover);
-    border-radius: var(--radius-sm);
-}
+/* Enhanced Responsive Design - Comprehensive Viewport Coverage */
 
-::-webkit-scrollbar-thumb {
-    background: var(--border-hover);
-    border-radius: var(--radius-sm);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--border-strong);
-}
-
-/* Improve focus visibility on all screen sizes */
-*:focus-visible {
-    outline: 2px solid var(--border-focus);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
-
-/* Ultra-wide screen optimizations */
-@media (min-width: 1920px) {
+/* Extra Large Screens (4K and Ultra-wide) */
+@media (min-width: 2560px) {
     .container {
-        max-width: 1600px;
+        max-width: 2000px;
+        padding: 4rem;
+    }
+    
+    section {
+        padding: 3rem;
+        font-size: 1.1rem;
+    }
+    
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 3.5rem;
+    }
+}
+
+/* Large Desktop (1600px-2559px) */
+@media (min-width: 1600px) and (max-width: 2559px) {
+    .container {
+        max-width: 1800px;
         padding: 3rem;
     }
     
     section {
+        padding: 2.5rem;
+    }
+    
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Standard Desktop (1200px-1599px) */
+@media (min-width: 1200px) and (max-width: 1599px) {
+    .container {
+        max-width: 1400px;
         padding: 2.5rem;
     }
     
@@ -965,44 +1071,18 @@ html {
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
-}
-
-/* Very small screens (phones in portrait) */
-@media (max-width: 360px) {
-    .container {
-        padding: 0.5rem;
-    }
-    
-    section {
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .classroom-header {
-        padding: 1rem;
-    }
     
     .app-navbar {
-        padding: 0.5rem;
-    }
-    
-    .nav-left .nav-logo {
-        height: 24px;
-    }
-    
-    .btn {
-        padding: 0.625rem 1rem;
-        font-size: 0.875rem;
-    }
-    
-    .add-student-form input {
-        padding: 0.75rem;
-        font-size: 0.95rem;
+        padding: 1rem 2rem;
     }
 }
 
-/* Large tablet and desktop improvements */
-@media (min-width: 769px) and (max-width: 1199px) {
+/* Small Desktop/Large Laptop (992px-1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .container {
+        padding: 2rem;
+    }
+    
     .attendance-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
@@ -1010,131 +1090,75 @@ html {
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-}
-
-/* Print styles */
-@media print {
-    .app-navbar,
-    .btn,
-    .modal {
-        display: none !important;
+    
+    .classroom-header h1 {
+        font-size: 2.25rem;
     }
     
-    body {
-        font-size: 12pt;
-        line-height: 1.4;
-    }
-    
-    section {
-        break-inside: avoid;
-        page-break-inside: avoid;
-        margin-bottom: 1rem;
-        box-shadow: none;
-        border: 1px solid #ccc;
+    .app-navbar {
+        padding: 1rem 1.5rem;
     }
 }
 
-/* Logo Styles - KUSA Branding */
-.logo-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-}
-
-.logo {
-    height: 60px;
-    width: auto;
-    max-width: 200px;
-    object-fit: contain;
-}
-
-.nav-logo {
-    height: 32px;
-    width: auto;
-    max-width: 120px;
-    object-fit: contain;
-}
-
-/* Responsive logo adjustments */
-@media (max-width: 768px) {
-    .logo {
-        height: 50px;
-        max-width: 160px;
-    }
-    
-    .nav-logo {
-        height: 28px;
-        max-width: 100px;
-    }
-}
-
-/* Modern Responsive Design */
-@media (max-width: 1024px) {
-    .main-content {
-        grid-template-columns: 1fr;
-    }
-    
+/* Tablet Landscape (769px-991px) */
+@media (min-width: 769px) and (max-width: 991px) {
     .container {
         padding: 1.5rem;
     }
     
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
     .app-navbar {
-        padding: 0.75rem 1rem;
+        padding: 1rem;
         flex-wrap: wrap;
-        gap: 1rem;
     }
     
     .nav-center {
         order: 3;
         flex-basis: 100%;
-        justify-content: stretch;
+        margin-top: 1rem;
     }
     
-    .classroom-selector {
-        justify-content: center;
+    section {
+        padding: 1.75rem;
     }
     
-    .classroom-selector select {
-        min-width: 200px;
-        flex: 1;
-        max-width: 300px;
+    .classroom-header {
+        padding: 1.75rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 2rem;
     }
 }
 
-@media (max-width: 768px) {
+/* Tablet Portrait (577px-768px) */
+@media (min-width: 577px) and (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: 1.25rem;
+    }
+    
+    .attendance-grid,
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
     }
     
     .add-student-form {
         flex-direction: column;
-    }
-    
-    .add-student-form input {
-        min-width: unset;
-        width: 100%;
+        gap: 1rem;
     }
     
     .week-selector,
     .history-controls {
         flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
-    
-    .week-selector input,
-    .history-controls select {
-        min-width: unset;
-        max-width: unset;
-        width: 100%;
-    }
-    
-    .attendance-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     section {
@@ -1148,49 +1172,34 @@ html {
     }
     
     .classroom-header h1 {
-        font-size: 2rem;
-    }
-    
-    header h1 {
-        font-size: 2rem;
+        font-size: 1.875rem;
     }
     
     .app-navbar {
-        padding: 0.5rem 1rem;
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
     }
     
     .nav-left .app-title {
-        font-size: 1.1rem;
-    }
-    
-    .nav-right {
-        gap: 0.5rem;
-    }
-    
-    .teacher-name {
-        display: none; /* Hide teacher name on mobile to save space */
-    }
-    
-    .classroom-selector select {
-        min-width: 150px;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-    
-    .classroom-selector .btn-sm {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.8rem;
+        font-size: 1rem;
     }
 }
 
-@media (max-width: 480px) {
+/* Large Mobile (481px-576px) */
+@media (min-width: 481px) and (max-width: 576px) {
     .container {
-        padding: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .attendance-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
     }
     
     section {
         padding: 1.25rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
     }
     
     .classroom-header {
@@ -1202,37 +1211,54 @@ html {
         font-size: 1.75rem;
     }
     
+    .app-navbar {
+        padding: 0.5rem 0.75rem;
+    }
+    
     .nav-left .app-title {
-        display: none; /* Hide app title on very small screens */
-    }
-    
-    .classroom-selector {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .classroom-selector select {
-        min-width: unset;
-        width: 100%;
+        font-size: 0.95rem;
     }
     
     .btn {
-        padding: 0.75rem 1.25rem;
+        padding: 0.75rem 1rem;
         font-size: 0.925rem;
     }
-    
-    .btn-sm {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.825rem;
+}
+
+/* Standard Mobile (361px-480px) */
+@media (min-width: 361px) and (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
     }
     
-    /* Improve text sizes on very small screens */
+    section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .classroom-header {
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.5rem;
+    }
+    
     section h2 {
         font-size: 1.25rem;
     }
     
-    .week-selector label {
-        font-size: 0.9rem;
+    .app-navbar {
+        padding: 0.5rem;
+    }
+    
+    .nav-left .app-title {
+        display: none;
+    }
+    
+    .teacher-name {
+        display: none;
     }
     
     .classroom-selector {
@@ -1241,257 +1267,290 @@ html {
     }
     
     .classroom-selector select {
-        min-width: unset;
         width: 100%;
+        min-width: unset;
+    }
+    
+    .btn {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 0.625rem;
+        font-size: 0.8rem;
     }
 }
 
-/* Login Screen Mobile Responsive */
+/* Small Mobile (320px-360px) */
+@media (min-width: 320px) and (max-width: 360px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    section {
+        padding: 0.875rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .classroom-header {
+        padding: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.375rem;
+    }
+    
+    section h2 {
+        font-size: 1.125rem;
+    }
+    
+    .app-navbar {
+        padding: 0.375rem 0.5rem;
+    }
+    
+    .nav-left .nav-logo {
+        height: 20px;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.825rem;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .add-student-form input {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .week-selector label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra Small Mobile (below 320px) */
+@media (max-width: 319px) {
+    .container {
+        padding: 0.375rem;
+    }
+    
+    section {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .classroom-header {
+        padding: 0.75rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    section h2 {
+        font-size: 1rem;
+    }
+    
+    .app-navbar {
+        padding: 0.25rem 0.375rem;
+    }
+    
+    .nav-left .nav-logo {
+        height: 18px;
+    }
+    
+    .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Orientation-specific adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+    .login-container {
+        margin: 0.5rem;
+        padding: 1.5rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .classroom-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* High-resolution displays */
+@media (min-resolution: 2dppx) {
+    .nav-logo,
+    .logo {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Ultra-wide screens */
+@media (min-aspect-ratio: 21/9) {
+    .container {
+        max-width: 90vw;
+    }
+    
+    .attendance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Foldable devices and narrow screens */
+@media (max-width: 280px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 0.25rem;
+    }
+    
+    section {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .app-navbar {
+        padding: 0.25rem;
+    }
+    
+    .nav-left .nav-logo {
+        height: 16px;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.7rem;
+    }
+    
+    .classroom-header h1 {
+        font-size: 1.125rem;
+    }
+    
+    section h2 {
+        font-size: 0.925rem;
+    }
+}
+
+/* Enhanced Mobile Scroll Behavior */
 @media (max-width: 768px) {
-    .login-screen {
+    body {
+        overflow-y: auto; /* Ensure body scrolling on mobile */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    
+    .main-app {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         background-attachment: scroll; /* Better performance on mobile */
-        background-size: cover;
-        background-position: center;
+    }
+    
+    .container {
+        overflow-y: visible; /* Let parent handle scrolling on mobile */
+        padding: 1rem;
+    }
+    
+    .main-content {
+        overflow-y: visible; /* Natural flow on mobile */
+        display: block; /* Change from grid to block on mobile for better scrolling */
+    }
+    
+    .login-screen {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        align-items: flex-start; /* Allow scrolling from top */
+        padding: 1rem 0;
     }
     
     .login-container {
         margin: 1rem;
         padding: 2rem;
+        max-height: none; /* Remove height restriction on mobile */
         max-width: none;
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(8px);
+        width: calc(100% - 2rem);
     }
     
-    .login-header .logo {
-        height: 50px;
-        max-width: 160px;
+    section {
+        margin-bottom: 1.5rem;
+        overflow-x: auto; /* Allow horizontal scroll for wide content */
+        -webkit-overflow-scrolling: touch;
     }
 }
 
 @media (max-width: 480px) {
     .login-container {
-        padding: 1.5rem;
         margin: 0.5rem;
-        background: rgba(255, 255, 255, 1); /* Solid background on very small screens for readability */
-        backdrop-filter: none;
+        padding: 1.5rem;
+        width: calc(100% - 1rem);
+    }
+    
+    .main-content {
+        gap: 1rem; /* Reduce gaps on small screens */
+    }
+    
+    section {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .container {
+        padding: 0.75rem;
     }
 }
 
-/* Enhanced Animations */
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+/* Improve scrollbar visibility on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    ::-webkit-scrollbar {
+        width: 12px; /* Wider scrollbar for touch */
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 6px;
+        border: 2px solid var(--surface);
     }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
+    
+    ::-webkit-scrollbar-track {
+        background: var(--surface-hover);
+        border-radius: 6px;
     }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-.student-item,
-.attendance-item,
-.stat-item,
-.history-item {
-    animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* Ensure sections don't break scrolling */
 section {
-    animation: fadeIn 0.6s ease-out;
+    break-inside: avoid; /* Prevent sections from breaking across scroll boundaries */
+    page-break-inside: avoid;
 }
 
-/* Modern Empty States */
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 3rem 1.5rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.empty-state i {
-    font-size: 3.5rem;
-    margin-bottom: 1.5rem;
-    opacity: 0.4;
-    color: var(--primary-color);
-}
-
-.empty-state p {
-    font-size: 1.125rem;
-    max-width: 300px;
-    line-height: 1.6;
-}
-
-/* Loading States */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    border-top: 2px solid transparent;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Enhanced Focus Indicators - ADA Compliant */
-.btn:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid var(--border-focus);
-    outline-offset: var(--focus-ring-offset);
-    box-shadow: var(--focus-ring);
-}
-
-/* High Contrast Mode Support */
-@media (prefers-contrast: high) {
-    :root {
-        --border: #000000;
-        --border-hover: #000000;
-        --text-primary: #000000;
-        --text-secondary: #000000;
-        --background: #ffffff;
-        --surface: #ffffff;
-    }
-    
-    .btn {
-        border-width: 3px;
-    }
-    
-    section {
-        border: 2px solid var(--border);
-    }
-}
-
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-    
-    .btn::before {
-        display: none;
-    }
-}
-
-/* Large Text Support */
-@media (min-resolution: 2dppx) {
-    body {
-        font-size: 18px;
-    }
-    
-    .btn {
-        min-height: 48px;
-        padding: 1rem 1.75rem;
-    }
-    
-    input, select, textarea {
-        min-height: 48px;
-        padding: 1rem 1.25rem;
-    }
-}
-
-/* Enhanced Tooltips */
-[data-tooltip] {
-    position: relative;
-}
-
-[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--text-primary);
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    white-space: nowrap;
-    z-index: 1000;
-    animation: fadeIn 0.2s ease;
-}
-
-/* Main App Background - Mobile Responsive */
-@media (max-width: 768px) {
-    .main-app {
-        background-attachment: scroll; /* Better performance on mobile */
-        background-size: cover;
-        background-position: center;
-    }
-    
-    .main-app::before {
-        background: rgba(255, 255, 255, 0.88); /* Slightly more opaque on mobile for readability */
-    }
-    
-    section {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
-    }
-    
-    .app-navbar {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-    }
-    
-    .classroom-header {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-    }
-}
-
-@media (max-width: 480px) {
-    .main-app::before {
-        background: rgba(255, 255, 255, 0.92); /* Even more opaque on very small screens */
-    }
-    
-    section {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(6px);
-    }
-    
-    .app-navbar,
-    .classroom-header {
-        background: rgba(255, 255, 255, 1); /* Solid background on very small screens */
-        backdrop-filter: none;
-    }
-}
+/* Enhanced Main App Background - Mobile Responsive */
